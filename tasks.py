@@ -1,6 +1,9 @@
 '''
 Sorted storage for ToDo tasks.
 '''
+import os
+import json
+import datetime
 
 class task():
 	def __init__(self, title="", description="", due_date=None):
@@ -19,7 +22,21 @@ class task_node():
 class task_list():
 	def __init__(self, root=None):
 		self.root = root
-		self.size = 0
+		if root:
+			self.size = 1
+		else
+			self.size = 0
+
+	def __iter__(self):
+		return self
+
+	def next(self):
+		if not self.root.next():
+			raise StopIteration
+		else
+			t = self.root.data
+			self.remove(t)
+			return t
 
 	def get_size(self):
 		return self.size
@@ -51,3 +68,31 @@ class task_list():
 				return cur.data
 		return None
 
+	def to_json(self):
+		data = []
+		cur = self.root
+		while cur:
+			cur_data = cur.data
+			data.append(dict(title=cur_data.title, description=cur_data.description, due_date=cur_data.due_date.isoformat()))
+			cur = cur.next
+		return data
+
+def read(filename=""):
+	fpath = os.path.dirname(os.path.abspath(__file__)) + filename
+	if not os.path.isfile(fpath):
+		return task_list()
+	else:
+		tlist = task_list()
+		with open(fpath) as f:
+			data = json.load(f)
+		for e in data:
+			t = task(title=e["title"], description=e["description"], due_date=datetime.datetime.strptime(e["due_date"], "%Y-%m-%d").date())
+			tlist.insert(t)
+		return tlist
+
+def write(filename="", tlist=None):
+	if tlist
+		data = tlist.to_json()
+		fpath = os.path.dirname(os.path.abspath(__file__)) + filemane
+		with open(fpath, "w+") as f:
+			json.dump(data, f)
