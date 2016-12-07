@@ -24,7 +24,7 @@ class task_list():
 		self.root = root
 		if root:
 			self.size = 1
-		else
+		else:
 			self.size = 0
 
 	def __iter__(self):
@@ -33,7 +33,7 @@ class task_list():
 	def next(self):
 		if not self.root.next():
 			raise StopIteration
-		else
+		else:
 			t = self.root.data
 			self.remove(t)
 			return t
@@ -91,7 +91,7 @@ def read(filename=""):
 		return tlist
 
 def write(filename="", tlist=None):
-	if tlist
+	if tlist:
 		data = tlist.to_json()
 		fpath = os.path.dirname(os.path.abspath(__file__)) + filemane
 		with open(fpath, "w+") as f:
