@@ -54,33 +54,33 @@ class mainWindow(QtGui.QMainWindow):
 		self.setCentralWidget(cwidget)
 
 	def update_display(self):
+
+		def gen_rm_cmd(task):
+			return lambda: self.remove_task(task)
+
 		if self.tasks.size != 0:
 			display_layout = QtGui.QVBoxLayout()
-			# for task in self.tasks:
-			for i in range(self.tasks.size):
+			for task in self.tasks:
 				next_block = QtGui.QGroupBox()
 				block_layout = QtGui.QVBoxLayout()
 
 				title_row = QtGui.QHBoxLayout()
-				# title_row.addWidget(QtGui.QLabel(task.title))
-				title_row.addWidget(QtGui.QLabel(self.tasks.access(i).title))
+				title_row.addWidget(QtGui.QLabel(task.title))
 				title_row.addStretch(1)
 				remove_btn = QtGui.QPushButton('X')	
 				title_row.addWidget(remove_btn)
 				block_layout.addLayout(title_row)
 
 				desc_row = QtGui.QHBoxLayout()
-				# desc_row.addWidget(QtGui.QLabel(task.description))
-				desc_row.addWidget(QtGui.QLabel(self.tasks.access(i).description))
+				desc_row.addWidget(QtGui.QLabel(task.description))
 				desc_row.addStretch(1)
-				# desc_row.addWidget(QtGui.QLabel(task.date_str()))
-				desc_row.addWidget(QtGui.QLabel(self.tasks.access(i).date_str()))
+				desc_row.addWidget(QtGui.QLabel(task.date_str()))
 				block_layout.addLayout(desc_row)
 
 				next_block.setLayout(block_layout)
 				display_layout.addWidget(next_block)
 
-				remove_btn.clicked.connect(lambda: self.remove_task(self.tasks.access(i)))
+				remove_btn.clicked.connect(gen_rm_cmd(task))
 
 			display_layout.addStretch(1)
 			inner_wrapper = QtGui.QWidget()
@@ -99,7 +99,6 @@ class mainWindow(QtGui.QMainWindow):
 
 
 	def remove_task(self, task=None, title="", description="", due_date=None):
-		print task.title
 		self.tasks.remove(old_task=task,
 						  title=title,
 						  description=description,
