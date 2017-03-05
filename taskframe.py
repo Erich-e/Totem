@@ -1,28 +1,26 @@
 '''
-UI component for task managment
+Task managing main portion
 '''
 
-import sys
-import copy
 import datetime
-from PyQt4 import QtGui, QtCore
-from tasks import task_list, task, t_read, t_write
+from PyQt4 import QtCore
+from PyQt4 import QtGui
+from tasks import TaskList, t_read, t_write
+from taskcontroller import TaskController
 
-class mainWindow(QtGui.QMainWindow):
+class TaskFrame(QtGui.QWidget):
 	def __init__(self, parent=None):
 		QtGui.QWidget.__init__(self, parent)
-		self.load()
+		self.load_tasks()
+		self.taskController = TaskController(self.tasks)
 		self.init_ui()
 
 	def init_ui(self):
-		self.resize(1000, 500)
-		with open("./QTDark.stylesheet") as f:
-			self.setStyleSheet(f.read())
 		self.layout = QtGui.QHBoxLayout()
-		self.menu_display = QtGui.QVBoxLayout()
 		self.task_display = None
+		self.menu_display = QtGui.QVBoxLayout()
 
-		self.update_display()
+		self.display_tasks()
 
 		self.menu_layout = QtGui.QGridLayout()
 		self.menu_layout.addWidget(QtGui.QLabel("Task: "), 0, 0)
@@ -41,6 +39,8 @@ class mainWindow(QtGui.QMainWindow):
 		self.submit_button = QtGui.QPushButton("New Task")
 		self.submit_button_layout.addWidget(self.submit_button)
 		self.submit_button_layout.addStretch(1)
+		self.undo_button = QtGui.QPushButton("Undo")
+		self.submit_button_layout.addWidget(self.undo_button)
 		self.menu_layout.addLayout(self.submit_button_layout, 3, 1)
 		self.submit_button.clicked.connect(self.insert_task)
 
@@ -48,12 +48,9 @@ class mainWindow(QtGui.QMainWindow):
 		self.menu_display.addStretch(1)
 
 		self.layout.addLayout(self.menu_display)
+		self.setLayout(self.layout)
 
-		cwidget = QtGui.QWidget()
-		cwidget.setLayout(self.layout)
-		self.setCentralWidget(cwidget)
-
-	def update_display(self):
+	def display_tasks(self):
 
 		def gen_rm_cmd(task):
 			return lambda: self.remove_task(task)
@@ -98,12 +95,17 @@ class mainWindow(QtGui.QMainWindow):
 		self.layout.insertWidget(0, self.task_display)
 
 
-	def remove_task(self, task=None, title="", description="", due_date=None):
-		self.tasks.remove(old_task=task,
-						  title=title,
-						  description=description,
-						  due_date=due_date)
-		self.update_display()
+	def load_tasks(self):
+		try:
+			self.tasks = t_read("save.json")
+		except:
+			self.tasks = TaskList()
+			err = QtGui.QErrorMessage()	
+			err.showMessage("Corrupted save file")
+			err.exec_()
+
+	def save_tasks(self):
+		t_write("save.json", self.tasks)
 
 	def insert_task(self):
 		title = str(self.title_edit.text())
@@ -111,28 +113,14 @@ class mainWindow(QtGui.QMainWindow):
 			desc = str(self.desc_edit.toPlainText())
 			qt_date = self.date_edit.selectedDate()
 			due_date = datetime.datetime.strptime(str(qt_date.toString(QtCore.Qt.ISODate)), "%Y-%m-%d").date()
-			self.tasks.insert(title=title, description=desc, due_date=due_date)
-			self.update_display()
+			self.taskController.insert_task(title=title, description=desc, due_date=due_date)
+			self.display_tasks()
 			self.title_edit.clear()
 			self.desc_edit.clear()
 
-	def load(self):
-		try:
-			self.tasks = t_read("save.json")
-		except:
-			self.tasks = task_list()
-			err = QtGui.QErrorMessage()
-			err.showMessage("Corrupted save file")
-			err.exec_()
-
-	def clean_up(self):
-		t_write("save.json", self.tasks)
-
-
-if __name__ == '__main__':
-	app = QtGui.QApplication(sys.argv)
-	window = mainWindow()
-	window.show()
-	app.lastWindowClosed.connect(window.clean_up)
-	app.exec_()
-	sys.exit()
+	def remove_task(self, task=None, title="", description="", due_date=None):
+		if(task):
+			self.taskController.remove_task(task=task)
+		else:
+			self.taskController.remove_task(title=title, description=description, due_date=due_date)
+		self.display_tasks()

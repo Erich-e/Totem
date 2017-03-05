@@ -5,12 +5,11 @@ import os
 import json
 import datetime
 
-class task():
+class Task():
 	def __init__(self, title="", description="", due_date=None):
 		self.title = title
 		self.description = description
 		self.due_date = due_date
-		# self.due_date = datetime.date.today()
 
 	def date_str(self):
 		return self.due_date.strftime("%a, %b %d")
@@ -22,7 +21,7 @@ class task():
 	def __ne__(self, other):
 		return not self.__eq__(other)
 
-class task_node():
+class TaskNode():
 	def __init__(self, data=None, next=None):
 		self.data = data
 		self.next = next
@@ -30,7 +29,7 @@ class task_node():
 	def set_next(self, node):
 		self.next = node
 
-class task_list():
+class TaskList():
 	def __init__(self, root=None):
 		self.root = root
 		if root:
@@ -56,21 +55,21 @@ class task_list():
 	def insert(self, new_task=None, title="", description="", due_date=None):
 		self.size += 1
 		if not new_task:
-			new_task = task(title=title, description=description, due_date=due_date)
+			new_task = Task(title=title, description=description, due_date=due_date)
 		if not self.root or self.root.data.due_date > new_task.due_date:
-			self.root = task_node(data=new_task, next=self.root)
+			self.root = TaskNode(data=new_task, next=self.root)
 		else:
 			cur = self.root
 			while cur.next and cur.next.data.due_date <= new_task.due_date:
 				cur = cur.next
-			cur.next = task_node(data=new_task, next=cur.next)
+			cur.next = TaskNode(data=new_task, next=cur.next)
 
 	def remove(self, old_task=None, title="", description="", due_date=None):
 		if self.size == 0:
 			return
 		self.size -= 1
 		if not old_task:
-			old_task = task(title=title, description=description, due_date=due_date)
+			old_task = Task(title=title, description=description, due_date=due_date)
 		if self.root.data == old_task:
 			self.root = self.root.next
 		else:
@@ -110,9 +109,9 @@ class task_list():
 def t_read(filename=""):
 	fpath = os.path.dirname(os.path.abspath(__file__)) + '/' + filename
 	if not os.path.isfile(fpath):
-		return task_list()
+		return TaskList()
 	else:
-		tlist = task_list()
+		tlist = TaskList()
 		with open(fpath) as f:
 			try:
 				data = json.load(f)
@@ -120,7 +119,7 @@ def t_read(filename=""):
 				raise
 		for e in data:
 			date_obj = datetime.datetime.strptime(e["due_date"], "%Y-%m-%d").date()
-			t = task(title=e["title"],
+			t = Task(title=e["title"],
 				description=e["description"],
 				due_date=date_obj)
 			tlist.insert(t)
