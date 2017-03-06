@@ -47,8 +47,9 @@ class TaskController():
 
 
 	def undo(self):
-		last_action = self.actions.pop()
-		if(last_action.before):
-			tasks.insert(**last_action.before)
-		if(last_action.after):
-			tasks.remove(**last_action.after)
+		if(self.actions):
+			last_action = self.actions.pop()
+			if(last_action.before):
+				self.tasks.insert(**last_action.before)
+			if(last_action.after):
+				self.tasks.remove(**last_action.after)
