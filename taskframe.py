@@ -3,6 +3,7 @@ Task managing main portion
 '''
 
 import datetime
+from editdialog import EditDialog
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 from tasks import TaskList, t_read, t_write
@@ -12,7 +13,7 @@ class TaskFrame(QtGui.QWidget):
 	def __init__(self, parent=None):
 		QtGui.QWidget.__init__(self, parent)
 		self.load_tasks()
-		self.taskController = TaskController(self.tasks)
+		self.task_controller = TaskController(self.tasks)
 		self.init_ui()
 
 	def init_ui(self):
@@ -55,6 +56,8 @@ class TaskFrame(QtGui.QWidget):
 
 		def gen_rm_cmd(task):
 			return lambda: self.remove_task(task)
+		def gen_ed_cmd(task):
+			return lambda: self.edit_task(task)
 
 		if self.tasks.size != 0:
 			display_layout = QtGui.QVBoxLayout()
@@ -65,6 +68,8 @@ class TaskFrame(QtGui.QWidget):
 				title_row = QtGui.QHBoxLayout()
 				title_row.addWidget(QtGui.QLabel(task.title))
 				title_row.addStretch(1)
+				edit_btn = QtGui.QPushButton('Edit')
+				title_row.addWidget(edit_btn)
 				remove_btn = QtGui.QPushButton('X')	
 				title_row.addWidget(remove_btn)
 				block_layout.addLayout(title_row)
@@ -78,6 +83,7 @@ class TaskFrame(QtGui.QWidget):
 				next_block.setLayout(block_layout)
 				display_layout.addWidget(next_block)
 
+				edit_btn.clicked.connect(gen_ed_cmd(task))
 				remove_btn.clicked.connect(gen_rm_cmd(task))
 
 			display_layout.addStretch(1)
@@ -114,18 +120,28 @@ class TaskFrame(QtGui.QWidget):
 			desc = str(self.desc_edit.toPlainText())
 			qt_date = self.date_edit.selectedDate()
 			due_date = datetime.datetime.strptime(str(qt_date.toString(QtCore.Qt.ISODate)), "%Y-%m-%d").date()
-			self.taskController.insert_task(title=title, description=desc, due_date=due_date)
+			self.task_controller.insert_task(title=title, description=desc, due_date=due_date)
 			self.display_tasks()
 			self.title_edit.clear()
 			self.desc_edit.clear()
 
-	def remove_task(self, task=None, title="", description="", due_date=None):
+	def remove_task(self, task=None, title='', description='', due_date=None):
 		if(task):
-			self.taskController.remove_task(task=task)
+			self.task_controller.remove_task(task=task)
 		else:
-			self.taskController.remove_task(title=title, description=description, due_date=due_date)
+			self.task_controller.remove_task(title=title, description=description, due_date=due_date)
 		self.display_tasks()
 
+	def edit_task(self, task=None, title='', description='', due_date=None):
+		if(task):
+			old_params = dict(old_title=task.title, old_desc=task.description, old_dd=task.due_date)
+		else:
+			old_params = dict(old_title=title, old_desc=description, old_dd=due_date)
+		self.edit_dialog = EditDialog(parent=self, params=old_params, task_controller=self.task_controller)
+		self.edit_dialog.exec_()
+		self.display_tasks()
+
+
 	def undo(self):
-		self.taskController.undo()
+		self.task_controller.undo()
 		self.display_tasks()

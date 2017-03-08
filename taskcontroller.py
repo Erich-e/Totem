@@ -31,15 +31,15 @@ class TaskController():
 		self.tasks.remove(**task_params)
 		self.actions.append(next_action)
 
-	def edit(self, old_task=None, old_title='', old_desc='', old_dd=None, new_task=None, new_title=None, new_desc='', new_dd=''):
+	def edit_task(self, old_task=None, old_title='', old_desc='', old_dd=None, new_task=None, new_title=None, new_desc='', new_dd=''):
 		if(old_task):
-			old_params = dict(title=old_task.title, desc=old_task.description, due_date=old_task.due_date)
+			old_params = dict(title=old_task.title, description=old_task.description, due_date=old_task.due_date)
 		else:
-			old_params = dict(title=old_title, desc=old_desc, due_date=old_dd)
+			old_params = dict(title=old_title, description=old_desc, due_date=old_dd)
 		if(new_task):
-			new_params = dict(title=new_task.title, desc=new_task.description, due_date=new_task.due_date)
+			new_params = dict(title=new_task.title, description=new_task.description, due_date=new_task.due_date)
 		else:
-			new_params = dict(title=new_title, desc=new_desc, due_date=new_dd)
+			new_params = dict(title=new_title, description=new_desc, due_date=new_dd)
 		next_action = Action(type='edit', before=old_params, after=new_params)
 		self.tasks.remove(**old_params)
 		self.tasks.insert(**new_params)

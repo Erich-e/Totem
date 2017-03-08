@@ -88,8 +88,7 @@ class TaskList():
 
 	def access(self, index=0):
 		if not self.root or index < 0:
-			print "index out of range"
-			raise
+			raise IndexError
 		else:
 			cur = self.root
 			while index > 0:

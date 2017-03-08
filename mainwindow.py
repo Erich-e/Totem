@@ -23,9 +23,6 @@ class MainWindow(QtGui.QMainWindow):
 
 		self.main_frame = QtGui.QTabWidget()
 		self.main_frame.addTab(self.task_frame, "Tasks")
-		# test = QtGui.QWidget()
-		# test.
-		# self.main_frame.addTab(QtGui.QWidget(), "test")
 		self.layout.addWidget(self.main_frame)
 
 		cwidget = QtGui.QWidget()
