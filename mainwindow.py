@@ -5,6 +5,7 @@ UI component for task managment
 import sys
 from PyQt4 import QtGui, QtCore
 from taskframe import TaskFrame
+from projectframe import ProjectFrame
 
 class MainWindow(QtGui.QMainWindow):
 	def __init__(self, parent=None):
@@ -14,6 +15,7 @@ class MainWindow(QtGui.QMainWindow):
 
 	def init_apps(self):
 		self.task_frame = TaskFrame()
+		self.project_frame = ProjectFrame()
 
 	def init_ui(self):
 		self.resize(1000, 500)
@@ -23,6 +25,7 @@ class MainWindow(QtGui.QMainWindow):
 
 		self.main_frame = QtGui.QTabWidget()
 		self.main_frame.addTab(self.task_frame, "Tasks")
+		self.main_frame.addTab(self.project_frame, "Projects")
 		self.layout.addWidget(self.main_frame)
 
 		cwidget = QtGui.QWidget()
