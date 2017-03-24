@@ -42,9 +42,13 @@ class TaskFrame(QtGui.QWidget):
 		self.submit_button_layout.addStretch(1)
 		self.undo_button = QtGui.QPushButton("Undo")
 		self.submit_button_layout.addWidget(self.undo_button)
+		self.save_button = QtGui.QPushButton("Save")
+		self.submit_button_layout.addWidget(self.save_button)
 		self.menu_layout.addLayout(self.submit_button_layout, 3, 1)
+
 		self.submit_button.clicked.connect(self.insert_task)
 		self.undo_button.clicked.connect(self.undo)
+		self.save_button.clicked.connect(self.save_tasks)
 
 		self.menu_display.addLayout(self.menu_layout)
 		self.menu_display.addStretch(1)
